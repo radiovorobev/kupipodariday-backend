@@ -1,5 +1,8 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn} from 'typeorm';
 import {IsEmail, IsUrl, Length} from 'class-validator';
+import {Wish} from "../../wishes/entities/wish.entity";
+import {Offer} from "../../offers/entities/offer.entity";
+import {Wishlist} from "../../wishlists/entities/wishlist.entity";
 @Entity()
 export class User {
     @PrimaryGeneratedColumn()
@@ -37,16 +40,13 @@ export class User {
     @Column()
     password: string;
 
-    //связать с таблицей wishes
-    @Column()
-    wishes: string;
+    @OneToMany(() => Wish, (wish) => wish.owner)
+    wishes: Wish;
 
-    //связать с таблицей offers
-    @Column()
-    offers: string;
+    @OneToMany(() => Offer, (offer) => offer.user)
+    offers: Offer;
 
-    //связать с таблицей wishlists
-    @Column()
-    wishlists: string;
+    @OneToMany(() => Wishlist, (wishlist) => wishlist.owner)
+    wishlists: Wishlist;
 
 }

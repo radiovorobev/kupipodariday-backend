@@ -1,5 +1,6 @@
-import {Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn} from 'typeorm';
-import {IsUrl} from "class-validator";
+import {Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn} from 'typeorm';
+import {User} from "../../users/entities/user.entity";
+import {Wish} from "../../wishes/entities/wish.entity";
 
 @Entity()
 export class Offer {
@@ -12,13 +13,11 @@ export class Offer {
     @UpdateDateColumn()
     updatedAt: Date;
 
-    //связать с users
-    @Column()
-    user: string;
+    @ManyToOne(() => User, (user) => user.offers)
+    user: User;
 
-    @Column()
-    @IsUrl()
-    item: string;
+    @ManyToOne(() => Wish, (wish) => wish.offers)
+    item: Wish;
 
     @Column()
     amount: number;

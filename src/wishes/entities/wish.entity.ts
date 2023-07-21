@@ -1,5 +1,15 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    ManyToOne,
+    OneToMany,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn
+} from 'typeorm';
 import { IsUrl, Length } from 'class-validator';
+import {User} from "../../users/entities/user.entity";
+import {Offer} from "../../offers/entities/offer.entity";
 @Entity()
 export class Wish {
     @PrimaryGeneratedColumn()
@@ -29,17 +39,15 @@ export class Wish {
     @Column()
     raised: number;
 
-    //связать с User
-    @Column()
-    owner: string;
+    @ManyToOne(() => User, (user) => user.wishes)
+    owner: User;
 
     @Column()
     @Length(1, 1024)
     description: string;
 
-    //связать с offers
-    @Column()
-    offers: string;
+    @OneToMany(() => Offer, (offer) => offer.item)
+    offers: Offer;
 
     @Column()
     copied: number;
