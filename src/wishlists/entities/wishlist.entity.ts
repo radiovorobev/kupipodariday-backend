@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { IsUrl } from 'class-validator';
+import {IsUrl, Length} from 'class-validator';
 
 @Entity()
 export class Wishlist {
@@ -12,6 +12,19 @@ export class Wishlist {
     @UpdateDateColumn()
     updatedAt: Date;
 
+    @Column()
+    @Length(1, 250)
+    name: string;
 
+    @Column()
+    @Length(0, 2500)
+    description: string;
 
+    @Column()
+    @IsUrl()
+    image: string;
+
+    //связать с wish
+    @Column()
+    items: string;
 }
