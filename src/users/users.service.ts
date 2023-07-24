@@ -26,13 +26,22 @@ export class UsersService {
     return this.userRepository.find();
   }
 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<User> {
+    return this.userRepository.findOneBy({ id });
+  }
+
+  async findById(id: number) {
     const user = await this.userRepository.findOne({
       where: { id },
     });
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
+    return user;
+  }
+
+  async findMany(query: string) {
+    const user = await this.userRepository.findOne({
+      where: [{ email: query }, { username: query }],
+    });
+
     return user;
   }
 
