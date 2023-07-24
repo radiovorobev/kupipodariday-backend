@@ -1,54 +1,54 @@
 import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    ManyToOne,
-    OneToMany,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { IsUrl, Length } from 'class-validator';
-import {User} from "../../users/entities/user.entity";
-import {Offer} from "../../offers/entities/offer.entity";
+import { User } from '../../users/entities/user.entity';
+import { Offer } from '../../offers/entities/offer.entity';
 @Entity()
 export class Wish {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @CreateDateColumn()
-    createdAt: Date;
+  @CreateDateColumn()
+  createdAt: Date;
 
-    @UpdateDateColumn()
-    updatedAt: Date;
+  @UpdateDateColumn()
+  updatedAt: Date;
 
-    @Column()
-    @Length(1, 250)
-    name: string;
+  @Column()
+  @Length(1, 250)
+  name: string;
 
-    @Column()
-    @IsUrl()
-    link: string;
+  @Column()
+  @IsUrl()
+  link: string;
 
-    @Column()
-    @IsUrl()
-    image: string;
+  @Column()
+  @IsUrl()
+  image: string;
 
-    @Column()
-    price: number;
+  @Column()
+  price: number;
 
-    @Column()
-    raised: number;
+  @Column({ default: 0 })
+  raised: number;
 
-    @ManyToOne(() => User, (user) => user.wishes)
-    owner: User;
+  @ManyToOne(() => User, (user) => user.wishes)
+  owner: User;
 
-    @Column()
-    @Length(1, 1024)
-    description: string;
+  @Column()
+  @Length(1, 1024)
+  description: string;
 
-    @OneToMany(() => Offer, (offer) => offer.item)
-    offers: Offer;
+  @OneToMany(() => Offer, (offer) => offer.item)
+  offers: Offer;
 
-    @Column()
-    copied: number;
+  @Column({ default: 0 })
+  copied: number;
 }

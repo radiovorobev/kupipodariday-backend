@@ -11,13 +11,16 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
+import { WishesService } from '../wishes/wishes.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtGuard } from '../guards/jwt.guard';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly wishesService: WishesService,
+  ) {}
 
   @UseGuards(JwtGuard)
   @Get('/me')
@@ -35,11 +38,6 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
-  @Get()
-  findAll() {
-    return this.usersService.findAll();
-  }
-
   @Get('/:username')
   async getUser(@Param('username') username: string) {
     const user = await this.usersService.findMany(username);
@@ -47,18 +45,22 @@ export class UsersController {
   }
 
   @UseGuards(JwtGuard)
-  @Post('/find')
-  async findUser(@Body() body) {
-    const user = await this.usersService.findMany(body.query);
-    return user;
-  }
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  @Get('me/wishes')
+  async getMyWishes(@Req() req) {
+    const { id } = req.user;
+    return await this.wishesService.findMyWishes(id);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  @UseGuards(JwtGuard)
+  @Post('find')
+  async findMany(@Body() body: { query: string }) {
+    return await this.usersService.findMany(body.query);
+  }
+
+  @UseGuards(JwtGuard)
+  @Patch('/me')
+  async updateUser(@Req() req, @Body() body) {
+    const user = await this.usersService.update(req.user.id, { ...body });
+    return user;
   }
 }

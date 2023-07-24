@@ -1,17 +1,51 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  NotFoundException,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { WishesService } from './wishes.service';
 import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishDto } from './dto/update-wish.dto';
+import { JwtGuard } from '../guards/jwt.guard';
+import { UsersService } from '../users/users.service';
 
 @Controller('wishes')
 export class WishesController {
-  constructor(private readonly wishesService: WishesService) {}
+  constructor(
+    private readonly wishesService: WishesService,
+  ) {}
 
+  @UseGuards(JwtGuard)
   @Post()
-  create(@Body() createWishDto: CreateWishDto) {
-    return this.wishesService.create(createWishDto);
+  async createWish(@Body() body, @Req() req) {
+    const wish = await this.wishesService.create(body, req.user);
+    return wish;
   }
 
+  @Get('/last')
+  async findLast() {
+    const wishes = await this.wishesService.findLast();
+    if (!wishes) {
+      throw new NotFoundException('Wishes not found');
+    }
+    return wishes;
+  }
+
+  @Get('/top')
+  async findTop() {
+    const wishes = await this.wishesService.findTop();
+    if (!wishes) {
+      throw new NotFoundException('Wishes not found');
+    }
+    return wishes;
+  }
   @Get()
   findAll() {
     return this.wishesService.findAll();

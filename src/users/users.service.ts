@@ -1,71 +1,62 @@
-import {Injectable, NotFoundException, UnauthorizedException} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { InjectRepository } from "@nestjs/typeorm";
+import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { BcryptService } from 'nest-bcrypt';
 
 @Injectable()
 export class UsersService {
   constructor(
-      @InjectRepository(User)
-      private readonly userRepository: Repository<User>,
+    @InjectRepository(User)
+    private readonly usersRepository: Repository<User>,
+    private readonly bcryptService: BcryptService,
   ) {}
   async create(createUserDto: CreateUserDto) {
     const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(createUserDto.password, saltRounds);
-    const newUser = this.userRepository.create({
+    const hashedPassword = await bcrypt.hash(
+      createUserDto.password,
+      saltRounds,
+    );
+    const newUser = this.usersRepository.create({
       ...createUserDto,
       password: hashedPassword,
     });
-    return this.userRepository.save(newUser);
-  }
-
-  findAll() {
-    return this.userRepository.find();
+    return this.usersRepository.save(newUser);
   }
 
   async findOne(id: number): Promise<User> {
-    return this.userRepository.findOneBy({ id });
+    return this.usersRepository.findOneBy({ id });
   }
 
   async findById(id: number) {
-    const user = await this.userRepository.findOne({
+    return await this.usersRepository.findOne({
       where: { id },
     });
-    return user;
   }
 
   async findMany(query: string) {
-    const user = await this.userRepository.findOne({
+    return await this.usersRepository.findOne({
       where: [{ email: query }, { username: query }],
     });
-
-    return user;
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
-    const user = await this.userRepository.findOne({
-      where: { id },
-    });
-    if (!user) {
-      throw new NotFoundException('User not found');
+  async update(id: number, createUserDto: CreateUserDto) {
+    if (createUserDto.password) {
+      const { password } = createUserDto;
+      const hash = await this.bcryptService.hash(password, 10);
+      await this.usersRepository.update(id, {
+        ...createUserDto,
+        password: hash,
+      });
+    } else {
+      await this.usersRepository.update(id, {
+        updatedAt: new Date(),
+        ...createUserDto,
+      });
     }
 
-    Object.assign(user, updateUserDto);
-
-    return this.userRepository.save(user);
-  }
-
-  async remove(id: number) {
-    const user = await this.userRepository.findOne({
-      where: { id },
-    });
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    await this.userRepository.remove(user);
+    return await this.findById(id);
   }
 }

@@ -1,23 +1,72 @@
-import {Injectable, NotFoundException} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishDto } from './dto/update-wish.dto';
-import {InjectRepository} from "@nestjs/typeorm";
-import {Repository} from "typeorm";
-import {Wish} from "./entities/wish.entity";
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Wish } from './entities/wish.entity';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class WishesService {
   constructor(
-      @InjectRepository(Wish)
-      private readonly wishRepository: Repository<Wish>,
+    @InjectRepository(Wish)
+    private readonly wishRepository: Repository<Wish>,
   ) {}
-  async create(createWishDto: CreateWishDto) {
-    const newWish = this.wishRepository.create(createWishDto);
-    return this.wishRepository.save(newWish);
+  async create(createWishDto: CreateWishDto, owner: User) {
+    const wish = await this.wishRepository.create({
+      ...createWishDto,
+      owner,
+    });
+
+    return this.wishRepository.save(wish);
+  }
+
+  async findMyWishes(id: number) {
+    const myWishes = await this.wishRepository.find({
+      relations: {
+        owner: true,
+        offers: { user: true },
+      },
+      where: { owner: { id } },
+    });
+    return myWishes;
+  }
+
+  async findLast() {
+    const lastWishes = await this.wishRepository.find({
+      relations: ['owner'],
+      order: {
+        createdAt: 'DESC',
+      },
+      take: 40,
+    });
+    return lastWishes;
+  }
+
+  async findTop() {
+    const topWishes = await this.wishRepository.find({
+      relations: ['owner'],
+      order: {
+        copied: 'DESC',
+      },
+      take: 10,
+    });
+    return topWishes;
   }
 
   findAll() {
     return this.wishRepository.find();
+  }
+
+  async findById(id: number) {
+    const wish = await this.wishRepository.findOne({
+      relations: {
+        owner: true,
+        offers: { user: true },
+      },
+      where: { id },
+    });
+    return wish;
   }
 
   async findOne(id: number) {
@@ -52,5 +101,12 @@ export class WishesService {
     }
 
     await this.wishRepository.remove(wish);
+  }
+
+  async updateRaised(wish: Wish, amount: number) {
+    return this.wishRepository.update(
+      { id: wish.id },
+      { raised: wish.raised + amount },
+    );
   }
 }
