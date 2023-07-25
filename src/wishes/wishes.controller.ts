@@ -11,16 +11,12 @@ import {
   Req,
 } from '@nestjs/common';
 import { WishesService } from './wishes.service';
-import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishDto } from './dto/update-wish.dto';
 import { JwtGuard } from '../guards/jwt.guard';
-import { UsersService } from '../users/users.service';
 
 @Controller('wishes')
 export class WishesController {
-  constructor(
-    private readonly wishesService: WishesService,
-  ) {}
+  constructor(private readonly wishesService: WishesService) {}
 
   @UseGuards(JwtGuard)
   @Post()

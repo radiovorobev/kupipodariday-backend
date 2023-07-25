@@ -1,8 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { OffersService } from './offers.service';
 import { CreateOfferDto } from './dto/create-offer.dto';
-import { UpdateOfferDto } from './dto/update-offer.dto';
-import { JwtGuard } from "../guards/jwt.guard";
+import { JwtGuard } from '../guards/jwt.guard';
 
 @Controller('offers')
 export class OffersController {
@@ -27,5 +34,4 @@ export class OffersController {
     const offer = await this.offersService.findOne(id);
     return offer;
   }
-
 }

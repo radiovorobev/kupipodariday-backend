@@ -22,36 +22,33 @@ export class WishesService {
   }
 
   async findMyWishes(id: number) {
-    const myWishes = await this.wishRepository.find({
+    return await this.wishRepository.find({
       relations: {
         owner: true,
         offers: { user: true },
       },
       where: { owner: { id } },
     });
-    return myWishes;
   }
 
   async findLast() {
-    const lastWishes = await this.wishRepository.find({
+    return await this.wishRepository.find({
       relations: ['owner'],
       order: {
         createdAt: 'DESC',
       },
       take: 40,
     });
-    return lastWishes;
   }
 
   async findTop() {
-    const topWishes = await this.wishRepository.find({
+    return await this.wishRepository.find({
       relations: ['owner'],
       order: {
         copied: 'DESC',
       },
       take: 10,
     });
-    return topWishes;
   }
 
   findAll() {
@@ -59,14 +56,13 @@ export class WishesService {
   }
 
   async findById(id: number) {
-    const wish = await this.wishRepository.findOne({
+    return await this.wishRepository.findOne({
       relations: {
         owner: true,
         offers: { user: true },
       },
       where: { id },
     });
-    return wish;
   }
 
   async findOne(id: number) {
