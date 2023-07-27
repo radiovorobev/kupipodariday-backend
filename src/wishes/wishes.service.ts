@@ -65,6 +65,17 @@ export class WishesService {
     });
   }
 
+  async findByOwner(id: number) {
+    const wishes = await this.wishRepository.find({
+      relations: {
+        owner: true,
+        offers: { user: true },
+      },
+      where: { owner: { id } },
+    });
+    return wishes;
+  }
+
   async findOne(id: number) {
     const wish = await this.wishRepository.findOne({
       where: { id },
@@ -104,5 +115,19 @@ export class WishesService {
       { id: wish.id },
       { raised: wish.raised + amount },
     );
+  }
+
+  async copy(id: number, owner: User) {
+    const wish = await this.findById(id);
+    await this.wishRepository.update(id, { copied: wish.copied + 1 });
+    const copyWish = await this.wishRepository.create({
+      name: wish.name,
+      link: wish.link,
+      image: wish.image,
+      price: wish.price,
+      description: wish.description,
+      owner,
+    });
+    return this.wishRepository.save(copyWish);
   }
 }

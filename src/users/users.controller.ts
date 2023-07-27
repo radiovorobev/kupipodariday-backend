@@ -39,7 +39,7 @@ export class UsersController {
 
   @Get('/:username')
   async getUser(@Param('username') username: string) {
-    const user = await this.usersService.findMany(username);
+    const user = await this.usersService.findUser(username);
     return user;
   }
 
@@ -51,9 +51,17 @@ export class UsersController {
   }
 
   @UseGuards(JwtGuard)
+  @Get('/:username/wishes')
+  async getWishes(@Param('username') username: string) {
+    const user = await this.usersService.findMany(username);
+    const wishes = await this.wishesService.findByOwner(user.id);
+    return wishes;
+  }
+
+  @UseGuards(JwtGuard)
   @Post('find')
   async findMany(@Body() body: { query: string }) {
-    return await this.usersService.findMany(body.query);
+    return await this.usersService.findUser(body.query);
   }
 
   @UseGuards(JwtGuard)

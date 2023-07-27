@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { IsUrl, Length } from 'class-validator';
+import { IsInt, IsNumber, IsString, IsUrl, Length } from 'class-validator';
 import { User } from '../../users/entities/user.entity';
 import { Offer } from '../../offers/entities/offer.entity';
 @Entity()
@@ -23,6 +23,7 @@ export class Wish {
 
   @Column()
   @Length(1, 250)
+  @IsString()
   name: string;
 
   @Column()
@@ -34,9 +35,11 @@ export class Wish {
   image: string;
 
   @Column()
+  @IsNumber()
   price: number;
 
   @Column({ default: 0 })
+  @IsNumber()
   raised: number;
 
   @ManyToOne(() => User, (user) => user.wishes)
@@ -50,5 +53,6 @@ export class Wish {
   offers: Offer;
 
   @Column({ default: 0 })
+  @IsInt()
   copied: number;
 }

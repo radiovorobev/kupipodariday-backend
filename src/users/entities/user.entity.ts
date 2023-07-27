@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { IsEmail, IsUrl, Length } from 'class-validator';
+import { IsEmail, IsString, IsUrl, Length } from 'class-validator';
 import { Wish } from '../../wishes/entities/wish.entity';
 import { Offer } from '../../offers/entities/offer.entity';
 import { Wishlist } from '../../wishlists/entities/wishlist.entity';
@@ -25,12 +25,14 @@ export class User {
     unique: true,
   })
   @Length(2, 30)
+  @IsString()
   username: string;
 
   @Column({
     default: 'Пока ничего не рассказал о себе.',
   })
   @Length(2, 200)
+  @IsString()
   about: string;
 
   @Column({
@@ -46,6 +48,7 @@ export class User {
   email: string;
 
   @Column()
+  @IsString()
   password: string;
 
   @OneToMany(() => Wish, (wish) => wish.owner)

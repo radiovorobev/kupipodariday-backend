@@ -42,6 +42,13 @@ export class UsersService {
     });
   }
 
+  async findUser(query: string) {
+    const user = await this.usersRepository.findOne({
+      where: [{ username: query }, { email: query }],
+    });
+    return [user];
+  }
+
   async update(id: number, createUserDto: CreateUserDto) {
     if (createUserDto.password) {
       const { password } = createUserDto;
